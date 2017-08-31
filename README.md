@@ -13,7 +13,7 @@ Next install the composer dependencies, assuming Docker is used:
 docker run --rm -it -v "$(pwd):/app" composer:latest install
 ```
 
-And then run the scrip:
+And then run the script:
 
 ```bash
 docker run --rm -it -v "$(pwd):/app" php:latest php -f /app/src/experiment.php
