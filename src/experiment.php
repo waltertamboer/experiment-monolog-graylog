@@ -7,7 +7,6 @@ use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Handler\GelfHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use RuntimeException;
 
 require __DIR__ . '/../vendor/autoload.php';
 
