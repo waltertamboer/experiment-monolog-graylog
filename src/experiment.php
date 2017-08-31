@@ -1,5 +1,14 @@
 <?php
 
+use Gelf\Publisher;
+use Gelf\Transport\TcpTransport;
+use Gelf\Transport\UdpTransport;
+use Monolog\Formatter\GelfMessageFormatter;
+use Monolog\Handler\GelfHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use RuntimeException;
+
 require __DIR__ . '/../vendor/autoload.php';
 
 $config = include __DIR__ . '/../config/global.php';
@@ -9,24 +18,22 @@ if (is_file(__DIR__ . '/../config/local.php')) {
 
 switch ($config['transport']) {
     case 'udp':
-        $transport = new \Gelf\Transport\UdpTransport($config['host'], $config['port']);
+        $transport = new UdpTransport($config['host'], $config['port']);
         break;
 
     case 'tcp':
-        $transport = new \Gelf\Transport\TcpTransport($config['host'], $config['port']);
+        $transport = new TcpTransport($config['host'], $config['port']);
         break;
 
     default:
-        throw new \RuntimeException('Invalid transport provided.');
+        throw new RuntimeException('Invalid transport provided.');
 }
 
-$transport = new \Gelf\Transport\UdpTransport($config['host'], $config['port']);
+$gelfHandler = new GelfHandler(new Publisher($transport));
+$gelfHandler->setFormatter(new GelfMessageFormatter($config['system-name']));
 
-$gelfHandler = new \Monolog\Handler\GelfHandler(new \Gelf\Publisher($transport));
-$gelfHandler->setFormatter(new \Monolog\Formatter\GelfMessageFormatter($config['system-name']));
-
-$logger = new Monolog\Logger('application', [
-    new \Monolog\Handler\StreamHandler('php://output'),
+$logger = new Logger('application', [
+    new StreamHandler('php://output'),
     $gelfHandler,
 ]);
 
